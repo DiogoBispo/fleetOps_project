@@ -1,0 +1,16 @@
+{
+  "name": "@fleetops/scraper",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "python main.py",
+    "lint": "pylint **/*.py"
+  },
+  "dependencies": {
+    "playwright": "^1.40.0"
+  },
+  "devDependencies": {
+    "python": "^3.11.0"
+  }
+}

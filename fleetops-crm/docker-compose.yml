@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=development
+      - DB_PATH=/app/data/fleetops.db
+    command: bun --watch src/index.ts
+    working_dir: /app/apps/api
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/web/src:/app/apps/web/src
+    environment:
+      - VITE_API_URL=http://api:3001
+    command: bun --watch
+    working_dir: /app/apps/web
+
+  scraper:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.scraper
+    volumes:
+      - ./apps/scraper:/app/apps/scraper
+      - ./data:/app/data
+    environment:
+      - LOCADORAS_CREDS=${LOCADORAS_CREDS}
+      - UNIC_CREDS=${UNIC_CREDS}
+      - TICKET_LOG_CREDS=${TICKET_LOG_CREDS}
+    profiles:
+      - scraper
+    working_dir: /app/apps/scraper
+
+networks:
+  default:
+    driver: bridge

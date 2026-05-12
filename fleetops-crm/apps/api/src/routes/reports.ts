@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { reportService } from '../services/reportService.js';
+import { reportService } from '../services/instances.js';
 
 export async function reportRoutes(fastify: FastifyInstance) {
   fastify.get('/fleet-summary', async () => {

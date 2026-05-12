@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "bun test"
   },
   "dependencies": {
     "@fleetops/types": "workspace:*",
     "@fleetops/core": "workspace:*",
     "@fleetops/db": "workspace:*",
     "@fleetops/utils": "workspace:*",
+    "drizzle-orm": "^0.29.0",
     "fastify": "^4.25.0",
     "@fastify/cors": "^8.5.0",
     "@fastify/cookie": "^9.3.0",

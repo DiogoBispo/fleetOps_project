@@ -1,9 +1,8 @@
 import type { Vehicle, Contract, Cost, Alert } from '@fleetops/types';
-import { isContractExpiring, calculateDaysBetween } from '@fleetops/utils';
 
 export function runAudit(vehicle: Vehicle, contract?: Contract, cost?: Cost): Partial<Alert>[] {
   const alerts: Partial<Alert>[] = [];
-  const today = new Date().toISOString();
+  const today = new Date();
 
   if (!contract) {
     alerts.push({
@@ -11,7 +10,7 @@ export function runAudit(vehicle: Vehicle, contract?: Contract, cost?: Cost): Pa
       severity: 'HIGH',
       message: `Veículo ${vehicle.plate} está sem contrato ativo.`,
     });
-  } else if (contract.endDate < today) {
+  } else if (new Date(contract.endDate).getTime() < today.getTime()) {
     alerts.push({
       type: 'CONTRACT_EXPIRED',
       severity: 'CRITICAL',
@@ -47,9 +46,10 @@ export function validateRentalCost(vehicle: Vehicle, contract: Contract, cost: C
 }
 
 export function checkContractExpirationAlert(contract: Contract): { shouldAlert: boolean; daysLeft: number } {
-  const endDate = new Date(contract.endDate);
   const now = new Date();
-  const daysLeft = calculateDaysBetween(now, contract.endDate);
+  const endDate = new Date(contract.endDate);
+  const diffMs = endDate.getTime() - now.getTime();
+  const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
   return {
     shouldAlert: daysLeft <= 30 && daysLeft > 0,

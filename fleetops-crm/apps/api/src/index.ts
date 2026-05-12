@@ -5,6 +5,7 @@ import { contractRoutes } from './routes/contracts.js';
 import { costRoutes } from './routes/costs.js';
 import { alertRoutes } from './routes/alerts.js';
 import { reportRoutes } from './routes/reports.js';
+import { auditRoutes } from './routes/audit.js';
 
 const server = Fastify({
   logger: true,
@@ -19,6 +20,7 @@ await server.register(contractRoutes, { prefix: '/api/contracts' });
 await server.register(costRoutes, { prefix: '/api/costs' });
 await server.register(alertRoutes, { prefix: '/api/alerts' });
 await server.register(reportRoutes, { prefix: '/api/reports' });
+await server.register(auditRoutes, { prefix: '/api/audit' });
 
 server.get('/api/health', async () => ({ status: 'ok' }));
 

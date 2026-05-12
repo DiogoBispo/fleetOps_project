@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { costService } from '../services/costService.js';
+import { costService } from '../services/instances.js';
 
 export async function costRoutes(fastify: FastifyInstance) {
   fastify.get('/', async () => {

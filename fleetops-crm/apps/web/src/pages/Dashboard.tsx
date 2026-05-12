@@ -1,10 +1,19 @@
 import { useMemo } from 'react';
 import { useVehicles } from '../hooks/useVehicles';
+import { useFleetSummary } from '../hooks/useFleetSummary';
+import { useActiveAlerts } from '../hooks/useActiveAlerts';
 import { Card, CardContent, CardHeader, CardTitle } from '@fleetops/ui';
 
 export function Dashboard() {
-  const { data: vehicles, isLoading } = useVehicles();
+  const { data: vehicles, isLoading, isError } = useVehicles();
+  const { data: fleetSummary, isLoading: isSummaryLoading } = useFleetSummary();
+  const { data: activeAlerts, isLoading: isAlertsLoading } = useActiveAlerts();
   const list = vehicles ?? [];
+  const statusSummary = fleetSummary?.byStatus ?? {};
+  const criticalAlertTypes = new Set(['CONTRACT_EXPIRED', 'ZERO_RENTAL']);
+  const criticalAlertsCount =
+    activeAlerts?.filter((alert) => criticalAlertTypes.has(alert.type)).length ?? 0;
+  const isKpiLoading = isSummaryLoading || isAlertsLoading;
 
   const statusCounts = useMemo(() => {
     return list.reduce((acc, vehicle) => {
@@ -30,6 +39,14 @@ export function Dashboard() {
       .slice(0, 5);
   }, [list]);
 
+  if (isError) {
+    return (
+      <div className="rounded-3xl border border-rose-200 bg-rose-50 p-6 text-rose-700">
+        Não foi possível carregar os dados do dashboard no momento.
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -49,7 +66,9 @@ export function Dashboard() {
             <CardTitle>Total de veículos</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-semibold text-slate-900">{isLoading ? '-' : list.length}</p>
+            <p className="text-4xl font-semibold text-slate-900">
+              {isKpiLoading ? '-' : fleetSummary?.totalVehicles ?? list.length}
+            </p>
           </CardContent>
         </Card>
 
@@ -58,16 +77,20 @@ export function Dashboard() {
             <CardTitle>Ativos</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-semibold text-emerald-700">{isLoading ? '-' : statusCounts.ATIVO ?? 0}</p>
+            <p className="text-4xl font-semibold text-emerald-700">
+              {isKpiLoading ? '-' : statusSummary.ATIVO ?? 0}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Pendentes</CardTitle>
+            <CardTitle>Alertas críticos</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-semibold text-indigo-700">{isLoading ? '-' : statusCounts.PENDING ?? 0}</p>
+            <p className="text-4xl font-semibold text-rose-700">
+              {isKpiLoading ? '-' : criticalAlertsCount}
+            </p>
           </CardContent>
         </Card>
 

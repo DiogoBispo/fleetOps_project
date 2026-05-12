@@ -1,8 +1,17 @@
-import { eq } from 'drizzle-orm';
-import { db, alerts } from '@fleetops/db';
 import type { Alert } from '@fleetops/types';
 
-function toAlert(row: typeof alerts.$inferSelect): Alert {
+type AlertRow = {
+  id: string;
+  vehicleId: string | null;
+  type: string;
+  title: string;
+  message: string;
+  read: number;
+  createdAt: string | null;
+  clientId: string | null;
+};
+
+function toAlert(row: AlertRow): Alert {
   return {
     id: row.id,
     vehicleId: row.vehicleId ?? undefined,
@@ -15,23 +24,25 @@ function toAlert(row: typeof alerts.$inferSelect): Alert {
   };
 }
 
-export const alertService = {
-  getAll(clientId?: string) {
-    const query = clientId
-      ? db.select().from(alerts).where(eq(alerts.clientId, clientId))
-      : db.select().from(alerts);
-    return query.all().map(toAlert);
-  },
-
-  getActive(clientId?: string) {
-    const baseQuery = clientId
-      ? db.select().from(alerts).where(eq(alerts.clientId, clientId))
-      : db.select().from(alerts);
-    return baseQuery.where(eq(alerts.read, 0)).all().map(toAlert);
-  },
-
-  markAsRead(id: string) {
-    db.update(alerts).set({ read: 1 }).where(eq(alerts.id, id)).run();
-    return { success: true };
-  },
+type AlertRepository = {
+  findAll: (clientId?: string) => AlertRow[];
+  findActive: (clientId?: string) => AlertRow[];
+  markAsRead: (id: string) => unknown;
 };
+
+export function createAlertService(repository: AlertRepository) {
+  return {
+    getAll(clientId?: string) {
+      return repository.findAll(clientId).map(toAlert);
+    },
+
+    getActive(clientId?: string) {
+      return repository.findActive(clientId).map(toAlert);
+    },
+
+    markAsRead(id: string) {
+      repository.markAsRead(id);
+      return { success: true };
+    },
+  };
+}

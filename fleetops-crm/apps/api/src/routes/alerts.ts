@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { alertService } from '../services/alertService.js';
+import { alertService } from '../services/instances.js';
 
 export async function alertRoutes(fastify: FastifyInstance) {
   fastify.get('/', async () => {

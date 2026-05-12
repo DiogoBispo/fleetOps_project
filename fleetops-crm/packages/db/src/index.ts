@@ -7,5 +7,6 @@ const DB_PATH = process.env.DB_PATH || path.join(__dirname, '../../data/fleetops
 
 export const sqlite = new Database(DB_PATH);
 export const db = drizzle(sqlite, { schema });
+export * from './schema';
 
 export type Database = typeof sqlite;

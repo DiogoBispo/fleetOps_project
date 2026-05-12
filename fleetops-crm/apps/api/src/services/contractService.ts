@@ -1,9 +1,19 @@
-import { eq } from 'drizzle-orm';
-import { db, contracts } from '@fleetops/db';
 import type { Contract } from '@fleetops/types';
-import { generateId } from '@fleetops/utils';
 
-function toContract(row: typeof contracts.$inferSelect): Contract {
+type ContractRow = {
+  id: string;
+  vehicleId: string;
+  startDate: string;
+  endDate: string;
+  kmLimit: number;
+  monthlyValue: number;
+  status: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+  clientId: string | null;
+};
+
+function toContract(row: ContractRow): Contract {
   return {
     id: row.id,
     vehicleId: row.vehicleId,
@@ -18,20 +28,25 @@ function toContract(row: typeof contracts.$inferSelect): Contract {
   };
 }
 
-export const contractService = {
-  getAll(clientId?: string) {
-    const query = clientId
-      ? db.select().from(contracts).where(eq(contracts.clientId, clientId))
-      : db.select().from(contracts);
-    return query.all().map(toContract);
-  },
-
-  getById(id: string) {
-    const row = db.select().from(contracts).where(eq(contracts.id, id)).get();
-    return row ? toContract(row) : null;
-  },
-
-  getByVehicleId(vehicleId: string) {
-    return db.select().from(contracts).where(eq(contracts.vehicleId, vehicleId)).all().map(toContract);
-  },
+type ContractRepository = {
+  findAll: (clientId?: string) => ContractRow[];
+  findById: (id: string) => ContractRow | undefined;
+  findByVehicleId: (vehicleId: string) => ContractRow[];
 };
+
+export function createContractService(repository: ContractRepository) {
+  return {
+    getAll(clientId?: string) {
+      return repository.findAll(clientId).map(toContract);
+    },
+
+    getById(id: string) {
+      const row = repository.findById(id);
+      return row ? toContract(row) : null;
+    },
+
+    getByVehicleId(vehicleId: string) {
+      return repository.findByVehicleId(vehicleId).map(toContract);
+    },
+  };
+}

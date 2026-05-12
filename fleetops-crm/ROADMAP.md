@@ -21,8 +21,8 @@ Este roadmap detalha as etapas de implementação do sistema, respeitando as dep
 *Garantir que o sistema tenha dados reais para processar.*
 
 - [x] **Script de Importação Excel**: Criar parser robusto para arquivos `.xlsx`.
-- [ ] **Mapeamento de Planilhas**: Configurar campos de Locadoras (Localiza, Movida) para o schema FleetOps.
-- [ ] **Validadores de Ingestão**: Garantir que placas e datas sejam normalizadas antes de entrar no DB.
+- [x] **Mapeamento de Planilhas**: Configurar campos de Locadoras (Localiza, Movida) para o schema FleetOps.
+- [x] **Validadores de Ingestão**: Garantir que placas e datas sejam normalizadas antes de entrar no DB.
 
 ---
 
@@ -41,10 +41,10 @@ Este roadmap detalha as etapas de implementação do sistema, respeitando as dep
 ##  Fase 3: Backend & API (Os "Serviços")
 *Exposição dos dados para o frontend.*
 
-- [ ] **Refatoração para Repositórios**: Mover lógica de DB de todos os serviços para `repositories`.
-- [ ] **Endpoints de Veículos**: Listagem, detalhes e histórico.
-- [ ] **Endpoints de Alertas**: Listar e marcar como lido.
-- [ ] **Endpoint de Execução de Auditoria**: Trigger manual via API.
+- [x] **Refatoração para Repositórios**: Mover lógica de DB de todos os serviços para `repositories`.
+- [x] **Endpoints de Veículos**: Listagem, detalhes e histórico.
+- [x] **Endpoints de Alertas**: Listar e marcar como lido.
+- [x] **Endpoint de Execução de Auditoria**: Trigger manual via API.
 - [ ] **Documentação Swagger**: (Opcional para MVP).
 
 ---

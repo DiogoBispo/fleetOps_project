@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { contractService } from '../services/contractService.js';
+import { contractService } from '../services/instances.js';
 
 export async function contractRoutes(fastify: FastifyInstance) {
   fastify.get('/', async () => {

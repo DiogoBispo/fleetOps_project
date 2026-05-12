@@ -1,27 +1,7 @@
 import Excel from 'exceljs';
 import { db, vehicles, contracts, costs } from '@fleetops/db';
+import { parseIngestionRow } from '@fleetops/core';
 import { generateId } from '@fleetops/utils';
-import type { Vehicle, Contract, Cost } from '@fleetops/types';
-
-interface ExcelRow {
-  placa?: string;
-  modelo?: string;
-  tipo?: string;
-  status?: string;
-  estado?: string;
-  cidade?: string;
-  centro_custo?: string;
-  item_contabil?: string;
-  locadora?: string;
-  data_inicio?: string;
-  data_fim?: string;
-  km_limite?: number;
-  valor_mensal?: number;
-  data_custo?: string;
-  tipo_custo?: string;
-  descricao_custo?: string;
-  valor_custo?: number;
-}
 
 export async function importFromExcel(filePath: string, clientId?: string): Promise<{
   imported: number;
@@ -35,42 +15,58 @@ export async function importFromExcel(filePath: string, clientId?: string): Prom
     throw new Error('Worksheet not found');
   }
 
-  const imported = 0;
+  const headerRow = worksheet.getRow(1);
+  const headers = headerRow.values as Array<string | number | undefined>;
+
+  let imported = 0;
   const errors: string[] = [];
 
   worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
     if (rowNumber === 1) return; // Skip header
 
-    const data = row.values as unknown as ExcelRow;
+    const rowValues = row.values as Array<string | number | Date | undefined>;
+    const rowData: Record<string, unknown> = {};
+    for (let i = 1; i < headers.length; i++) {
+      const header = headers[i];
+      if (!header) continue;
+      rowData[String(header)] = rowValues[i];
+    }
 
     try {
+      const parsed = parseIngestionRow(rowData);
+      if (!parsed.row) {
+        errors.push(`Row ${rowNumber}: ${parsed.errors.join(', ')}`);
+        return;
+      }
+
+      const data = parsed.row;
       const vehicleId = generateId();
       const now = new Date().toISOString();
 
       db.insert(vehicles).values({
         id: vehicleId,
-        plate: data.placa?.toUpperCase() ?? '',
-        model: data.model ?? '',
-        type: data.tipo ?? '',
-        status: (data.status ?? 'PENDING') as string,
-        state: data.estado ?? '',
-        city: data.cidade ?? '',
-        costCenter: data.centro_custo ?? null,
-        accountItem: data.item_contabil ?? null,
-        rentalCompany: data.locadora ?? null,
+        plate: data.plate,
+        model: data.model,
+        type: data.type,
+        status: data.status as string,
+        state: data.state,
+        city: data.city,
+        costCenter: data.costCenter ?? null,
+        accountItem: data.accountItem ?? null,
+        rentalCompany: data.rentalCompany ?? null,
         createdAt: now,
         updatedAt: now,
         clientId: clientId ?? null,
       }).run();
 
-      if (data.data_inicio && data.data_fim) {
+      if (data.contractStartDate && data.contractEndDate) {
         db.insert(contracts).values({
           id: generateId(),
           vehicleId,
-          startDate: data.data_inicio,
-          endDate: data.data_fim,
-          kmLimit: data.km_limite ?? 0,
-          monthlyValue: data.valor_mensal ?? 0,
+          startDate: data.contractStartDate,
+          endDate: data.contractEndDate,
+          kmLimit: data.contractKmLimit ?? 0,
+          monthlyValue: data.contractMonthlyValue ?? 0,
           status: 'PENDING',
           createdAt: now,
           updatedAt: now,
@@ -78,14 +74,14 @@ export async function importFromExcel(filePath: string, clientId?: string): Prom
         }).run();
       }
 
-      if (data.valor_custo && data.data_custo) {
+      if (data.costAmount !== undefined && data.costDate) {
         db.insert(costs).values({
           id: generateId(),
           vehicleId,
-          type: (data.tipo_custo ?? 'OTHER') as string,
-          description: data.descricao_custo ?? '',
-          amount: data.valor_custo,
-          date: data.data_custo,
+          type: (data.costType ?? 'OTHER') as string,
+          description: data.costDescription ?? '',
+          amount: data.costAmount,
+          date: data.costDate,
           createdAt: now,
           clientId: clientId ?? null,
         }).run();

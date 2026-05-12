@@ -9,8 +9,5 @@
   },
   "dependencies": {
     "playwright": "^1.40.0"
-  },
-  "devDependencies": {
-    "python": "^3.11.0"
   }
 }

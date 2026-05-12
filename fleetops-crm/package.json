@@ -2,12 +2,16 @@
   "name": "fleetops-crm",
   "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "turbo dev",
+    "dev": "(cd apps/api && bun --watch src/index.ts) & (cd apps/web && bun run dev)",
     "build": "turbo build",
     "lint": "turbo lint",
     "test": "turbo test",
-    "db:push": "cd packages/db && bunx drizzle-kit push",
+    "db:push": "cd packages/db && bun run push",
     "db:seed": "cd packages/db && bun run seed.ts",
     "api": "cd apps/api && bun --watch src/index.ts",
     "web": "cd apps/web && bun --watch",

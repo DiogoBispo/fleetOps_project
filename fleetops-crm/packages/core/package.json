@@ -9,9 +9,11 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "bun test"
   },
   "dependencies": {
+    "@fleetops/utils": "workspace:*",
     "@fleetops/types": "workspace:*",
     "zod": "^3.22.0"
   },

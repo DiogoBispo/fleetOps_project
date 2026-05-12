@@ -27,13 +27,16 @@ fleetops-crm/
 ```bash
 # Instalar dependências
 cd fleetops-crm
-pnpm install
+bun install
+
+# Instalar dependências do pacote de banco
+cd packages/db && bun install && cd ../..
 
 # Rodar migrações do banco
-pnpm db:push --filter @fleetops/db
+bun run db:push
 
 # Iniciar desenvolvimento
-pnpm dev
+bun run dev
 ```
 
 ## Docker (Recomendado)
@@ -52,6 +55,7 @@ docker-compose logs -f
 ```
 
 ### Portas:
+
 - **Frontend**: http://localhost:3000
 - **Backend (API)**: http://localhost:3001
 

@@ -52,14 +52,14 @@ Este roadmap detalha as etapas de implementação do sistema, respeitando as dep
 ##  Fase 4: Frontend (A "Interface")
 *Visualização e operação do sistema.*
 
-- [ ] **Layout Base**: Sidebar, Header e Design System (Radix + Tailwind).
+- [x] **Layout Base**: Sidebar, Header e Design System (Radix + Tailwind).
 - [ ] **Dashboard Principal**:
-    - [ ] Cards de KPI (Total veículos, Ativos, Alertas Críticos).
+    - [x] Cards de KPI (Total veículos, Ativos, Alertas Críticos).
     - [ ] Gráfico de custos mensais.
-- [ ] **Gestão de Frota**:
-    - [ ] Tabela dinâmica de veículos com filtros.
-    - [ ] Drawer/Modal de detalhes do veículo.
-- [ ] **Central de Alertas**: Visualização priorizada por severidade.
+- [x] **Gestão de Frota**:
+    - [x] Tabela dinâmica de veículos com filtros.
+    - [x] Drawer/Modal de detalhes do veículo.
+- [x] **Central de Alertas**: Visualização priorizada por severidade.
 
 ---
 
